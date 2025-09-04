@@ -10,19 +10,13 @@ pub fn init() Self {
         .flags = null,
     };
 
-    self.flags = imgui.ImGuiWindowFlags_NoTitleBar;
-    // self.flags.? |= imgui.ImGuiWindowFlags_NoMove;
+    self.flags = imgui.ImGuiWindowFlags_None;
 
     return self;
 }
 
 pub fn draw(self: *Self) void {
-
-    // centring
-    // const center = imgui.ImGuiViewport_GetCenter(imgui.ImGui_GetMainViewport());
-    // imgui.ImGui_SetNextWindowPosEx(center, imgui.ImGuiCond_Always, imgui.ImVec2_t{.x = 0.5, .y = 0.5});
-
-    _ = imgui.ImGui_Begin("hi window", null, self.flags.?);
-    imgui.ImGui_Text("text 00");
+    _ = imgui.ImGui_Begin("main window", null, self.flags.?);
+    imgui.ImGui_Text("content here");
     imgui.ImGui_End();
 }

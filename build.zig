@@ -13,7 +13,6 @@ pub fn build(b: *std.Build) void {
         .renderer = cimgui.Renderer.OpenGL3,
     });
     const cimgui_artifact = cimgui_dep.artifact("cimgui");
-
  
     // eecutable
     const exe = b.addExecutable(.{

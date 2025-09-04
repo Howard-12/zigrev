@@ -54,6 +54,7 @@ pub fn setup(config: Config) !Self {
     _ = c.CIMGUI_CHECKVERSION();
     _ = c.ImGui_CreateContext(null);
 
+
     const io = c.ImGui_GetIO();
     io.*.ConfigFlags |= c.ImGuiConfigFlags_NavEnableKeyboard;
     io.*.ConfigFlags |= c.ImGuiConfigFlags_DockingEnable;
@@ -77,6 +78,7 @@ pub fn run(self: *Self) void {
         c.cImGui_ImplGlfw_NewFrame();
         c.ImGui_NewFrame();
 
+        _= c.ImGui_DockSpaceOverViewport();
         c.ImGui_ShowDemoWindow(null);
 
         // ui 
@@ -113,3 +115,4 @@ pub fn clean(self: *Self) void {
     c.cImGui_ImplOpenGL3_Shutdown();
     c.ImGui_DestroyContext(null);
 }
+
