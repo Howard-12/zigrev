@@ -21,14 +21,14 @@ const Self = @This();
 window: ?*c.GLFWwindow,
 config: Config,
 // window_widges: , //#TODO window widget management 
-t: ui.t,
+mainport: ui.main_viewport,
 
 
 pub fn setup(config: Config) !Self {
     var self = Self{
         .window = null,
         .config = config,
-        .t = undefined,
+        .mainport = undefined,
     };
     
     // glfw setup
@@ -63,7 +63,7 @@ pub fn setup(config: Config) !Self {
     _ = c.cImGui_ImplOpenGL3_InitEx("#version 130");
     
 
-    self.t = ui.t.init();
+    self.mainport = ui.main_viewport.init();
     
     return self;
 }
@@ -80,7 +80,7 @@ pub fn run(self: *Self) void {
         c.ImGui_ShowDemoWindow(null);
 
         // ui 
-        self.t.draw();
+        self.mainport.draw();
 
 
         c.ImGui_Render();
