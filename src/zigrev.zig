@@ -10,6 +10,7 @@ pub const c = @cImport({
     @cInclude("dcimgui.h");
     @cInclude("backends/dcimgui_impl_glfw.h");
     @cInclude("backends/dcimgui_impl_opengl3.h");
+    @cInclude("cimgui_memory_editor.h");
 });
 
 pub const Config = struct {
@@ -22,13 +23,14 @@ window: ?*c.GLFWwindow,
 config: Config,
 // window_widges: , //#TODO window widget management 
 mainport: ui.main_viewport,
-
+md: ?*c.MemoryEditor,
 
 pub fn setup(config: Config) !Self {
     var self = Self{
         .window = null,
         .config = config,
         .mainport = undefined,
+        .md = undefined,
     };
     
     // glfw setup
@@ -54,7 +56,6 @@ pub fn setup(config: Config) !Self {
     _ = c.CIMGUI_CHECKVERSION();
     _ = c.ImGui_CreateContext(null);
 
-
     const io = c.ImGui_GetIO();
     io.*.ConfigFlags |= c.ImGuiConfigFlags_NavEnableKeyboard;
     io.*.ConfigFlags |= c.ImGuiConfigFlags_DockingEnable;
@@ -65,11 +66,13 @@ pub fn setup(config: Config) !Self {
     
 
     self.mainport = ui.main_viewport.init();
+    self.md = c.MemoryEditor_MemoryEditor();
     
     return self;
 }
 
 pub fn run(self: *Self) void {
+    var buf: [256]u8 = undefined;
     while (c.glfwWindowShouldClose(self.window) != c.GLFW_TRUE) {
         c.glfwPollEvents();
 
@@ -79,11 +82,12 @@ pub fn run(self: *Self) void {
         c.ImGui_NewFrame();
 
         _= c.ImGui_DockSpaceOverViewport();
-        c.ImGui_ShowDemoWindow(null);
+        // c.ImGui_ShowDemoWindow(null);
 
         // ui 
         self.mainport.draw();
 
+        c.MemoryEditor_DrawWindow(self.md, "mem edit", &buf, buf.len, 0);
 
         c.ImGui_Render();
 
@@ -111,6 +115,7 @@ pub fn clean(self: *Self) void {
     gl.makeProcTableCurrent(null);
 
     // imgui
+    c.MemoryEditor_destroy(self.md);
     c.cImGui_ImplGlfw_Shutdown();
     c.cImGui_ImplOpenGL3_Shutdown();
     c.ImGui_DestroyContext(null);

@@ -13,6 +13,7 @@ pub fn build(b: *std.Build) void {
         .renderer = cimgui.Renderer.OpenGL3,
     });
     const cimgui_artifact = cimgui_dep.artifact("cimgui");
+
  
     // eecutable
     const exe = b.addExecutable(.{
@@ -27,6 +28,12 @@ pub fn build(b: *std.Build) void {
         }),
     });
     exe.linkLibrary(cimgui_artifact);
+    exe.root_module.addIncludePath(b.path("include/"));
+    exe.root_module.addCSourceFile(.{
+        .file = b.path("src/ui/extensions/cimgui_memory_editor.cpp"),
+        .flags = &.{"-std=c++17"},
+        .language = .cpp
+    });
 
     b.installArtifact(exe);
 
