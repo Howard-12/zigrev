@@ -1,2 +1,2 @@
 # Description
-A fun way to program
+An interactive debugger for pwn/rev
