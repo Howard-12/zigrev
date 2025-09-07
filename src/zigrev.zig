@@ -1,6 +1,6 @@
 const std = @import("std");
 const gl = @import("gl");
-const ui = @import("ui/ui.zig");
+const ui_dep = @import("ui/ui.zig");
 
 var procs: gl.ProcTable = undefined;
 
@@ -21,16 +21,13 @@ const Self = @This();
 
 window: ?*c.GLFWwindow,
 config: Config,
-// window_widges: , //#TODO window widget management 
-mainport: ui.main_viewport,
-md: ?*c.MemoryEditor,
+ui: ui_dep,
 
 pub fn setup(config: Config) !Self {
     var self = Self{
         .window = null,
         .config = config,
-        .mainport = undefined,
-        .md = undefined,
+        .ui = undefined,
     };
     
     // glfw setup
@@ -67,14 +64,12 @@ pub fn setup(config: Config) !Self {
     _ = c.cImGui_ImplOpenGL3_InitEx("#version 130");
     
 
-    self.mainport = ui.main_viewport.init();
-    self.md = c.MemoryEditor_MemoryEditor();
+    self.ui = ui_dep.init();
     
     return self;
 }
 
 pub fn run(self: *Self) void {
-    var buf: [256]u8 = undefined;
     while (c.glfwWindowShouldClose(self.window) != c.GLFW_TRUE) {
         c.glfwPollEvents();
 
@@ -86,10 +81,8 @@ pub fn run(self: *Self) void {
         _= c.ImGui_DockSpaceOverViewport();
         // c.ImGui_ShowDemoWindow(null);
 
-        // ui 
-        self.mainport.draw();
-
-        c.MemoryEditor_DrawWindow(self.md, "mem edit", &buf, buf.len, 0);
+        // ui
+        self.ui.draw();
 
         c.ImGui_Render();
 
@@ -117,7 +110,7 @@ pub fn clean(self: *Self) void {
     gl.makeProcTableCurrent(null);
 
     // imgui
-    c.MemoryEditor_destroy(self.md);
+    self.ui.deinit();
     c.cImGui_ImplGlfw_Shutdown();
     c.cImGui_ImplOpenGL3_Shutdown();
     c.ImGui_DestroyContext(null);
