@@ -1,11 +1,14 @@
 const std = @import("std");
-const imgui = @import("root").zigrev.c;
+const zigrev = @import("root").zigrev;
+const imgui = zigrev.c;
+const GlobalState = zigrev.GlobalState;
 
 const Self = @This();
 
 flags: ?imgui.ImGuiWindowFlags,
 editor_window: ?*imgui.MemoryEditor,
 buf: [256]u8,
+show_window: bool = true,
 
 pub fn init() Self {
     var self = Self{
@@ -21,7 +24,18 @@ pub fn init() Self {
     return self;
 }
 
-pub fn draw(self: *Self) void {
-    imgui.MemoryEditor_DrawWindow(self.editor_window, "mem edit", &self.buf, self.buf.len, 0);
+pub fn update(self: *Self, state: *GlobalState) void{
+    _ = self;
+    _ = state;
 }
 
+pub fn draw(self: *Self, state: *GlobalState) void {
+    // _ = state;
+    // imgui.MemoryEditor_DrawWindow(self.editor_window, "mem edit", &self.buf, self.buf.len, 0);
+    imgui.MemoryEditor_DrawWindow(self.editor_window, "mem edit", state.process.memory_buffer.ptr, state.process.memory_buffer.len, 0);
+}
+
+
+pub fn deinit(_: *Self) void {
+
+}

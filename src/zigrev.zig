@@ -1,6 +1,7 @@
 const std = @import("std");
 const gl = @import("gl");
 const ui_dep = @import("ui/ui.zig");
+const Process = @import("debugger/process.zig");
 
 var procs: gl.ProcTable = undefined;
 
@@ -17,18 +18,35 @@ pub const Config = struct {
     vsync: bool = false,
 };
 
+pub const GlobalState = struct {
+    process: Process
+};
+
 const Self = @This();
 
+const GPA = std.heap.GeneralPurposeAllocator(.{});
+gpa: ?GPA,
+allocator: std.mem.Allocator,
 window: ?*c.GLFWwindow,
 config: Config,
 ui: ui_dep,
+state: GlobalState,
 
 pub fn setup(config: Config) !Self {
     var self = Self{
+        .gpa = null,
+        .allocator = undefined,
         .window = null,
         .config = config,
         .ui = undefined,
+        .state = undefined,
     };
+
+    self.gpa = GPA{};
+    self.allocator = if (self.gpa) |*alloc| 
+        alloc.allocator()
+    else
+        unreachable;
     
     // glfw setup
     if (c.glfwInit() != c.GLFW_TRUE)
@@ -63,6 +81,9 @@ pub fn setup(config: Config) !Self {
     _ = c.cImGui_ImplGlfw_InitForOpenGL(self.window, true);
     _ = c.cImGui_ImplOpenGL3_InitEx("#version 130");
     
+    self.state = GlobalState{
+        .process = Process.init(self.allocator),
+    };
 
     self.ui = ui_dep.init();
     
@@ -73,7 +94,6 @@ pub fn run(self: *Self) void {
     while (c.glfwWindowShouldClose(self.window) != c.GLFW_TRUE) {
         c.glfwPollEvents();
 
-
         c.cImGui_ImplOpenGL3_NewFrame();
         c.cImGui_ImplGlfw_NewFrame();
         c.ImGui_NewFrame();
@@ -82,7 +102,8 @@ pub fn run(self: *Self) void {
         // c.ImGui_ShowDemoWindow(null);
 
         // ui
-        self.ui.draw();
+        self.ui.update(&self.state);
+        self.ui.draw(&self.state);
 
         c.ImGui_Render();
 
