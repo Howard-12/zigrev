@@ -1,7 +1,7 @@
 const std = @import("std");
 const zigrev = @import("root").zigrev;
 const imgui = zigrev.c;
-const GlobalState = zigrev.GlobalState;
+const SharedState = zigrev.SharedState;
 
 const Self = @This();
 
@@ -24,14 +24,14 @@ pub fn init() Self {
     return self;
 }
 
-pub fn update(self: *Self, state: *GlobalState) void{
+pub fn update(self: *Self, state: *SharedState) void{
+    // if (!self.show_window) return;
     _ = self;
     _ = state;
 }
 
-pub fn draw(self: *Self, state: *GlobalState) void {
-    // _ = state;
-    // imgui.MemoryEditor_DrawWindow(self.editor_window, "mem edit", &self.buf, self.buf.len, 0);
+pub fn draw(self: *Self, state: *SharedState) void {
+    // if (!self.show_window) return;
     imgui.MemoryEditor_DrawWindow(self.editor_window, "mem edit", state.process.memory_buffer.ptr, state.process.memory_buffer.len, 0);
 }
 

@@ -2,6 +2,7 @@ const std = @import("std");
 const gl = @import("gl");
 const ui_dep = @import("ui/ui.zig");
 const Process = @import("debugger/process.zig");
+pub const SharedState = @import("shared_state.zig");
 
 var procs: gl.ProcTable = undefined;
 
@@ -18,9 +19,6 @@ pub const Config = struct {
     vsync: bool = false,
 };
 
-pub const GlobalState = struct {
-    process: Process
-};
 
 const Self = @This();
 
@@ -30,7 +28,7 @@ allocator: std.mem.Allocator,
 window: ?*c.GLFWwindow,
 config: Config,
 ui: ui_dep,
-state: GlobalState,
+state: SharedState,
 
 pub fn setup(config: Config) !Self {
     var self = Self{
@@ -81,7 +79,7 @@ pub fn setup(config: Config) !Self {
     _ = c.cImGui_ImplGlfw_InitForOpenGL(self.window, true);
     _ = c.cImGui_ImplOpenGL3_InitEx("#version 130");
     
-    self.state = GlobalState{
+    self.state = SharedState{
         .process = Process.init(self.allocator),
     };
 
