@@ -5,8 +5,8 @@
     .minimum_zig_version = "0.15.1",
     .dependencies = .{
         .cimgui_zig = .{
-            .url = "https://github.com/tiawl/cimgui.zig/archive/daf7f58ef9c8d1f44c90e20d7589d7d28229d6e2.tar.gz",
-            .hash = "cimgui_zig-1.0.0-2Xubkh99XwCEp9WF-e5M7quh25HcE9R9TnS6tO9EfhBW",
+            .url = "https://github.com/tiawl/cimgui.zig/archive/21711ac466795d0de3327f59529835775434e928.tar.gz",
+            .hash = "cimgui_zig-1.0.0-2Xubkid9XwCxc-awqhsWuSOpA6SITRgpeXSusc4nWnlD",
         },
     },
     .paths = .{

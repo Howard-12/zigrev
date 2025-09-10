@@ -7,32 +7,40 @@ const Self = @This();
 
 flags: ?imgui.ImGuiWindowFlags,
 editor_window: ?*imgui.MemoryEditor,
-buf: [256]u8,
+default_buf: [100]u8,
 show_window: bool = true,
 
 pub fn init() Self {
     var self = Self{
         .flags = null,
         .editor_window = null,
-        .buf = undefined,
+        .default_buf = undefined,
     };
 
     self.flags = imgui.ImGuiWindowFlags_None;
     self.editor_window = imgui.MemoryEditor_MemoryEditor();
-    self.buf[0] = 1;
+    self.default_buf = .{0} ** 100;
 
     return self;
 }
 
 pub fn update(self: *Self, state: *SharedState) void{
-    // if (!self.show_window) return;
-    _ = self;
+    if (!self.show_window) 
+        return;
+
     _ = state;
 }
 
 pub fn draw(self: *Self, state: *SharedState) void {
-    // if (!self.show_window) return;
-    imgui.MemoryEditor_DrawWindow(self.editor_window, "mem edit", state.process.memory_buffer.ptr, state.process.memory_buffer.len, 0);
+    if (!self.show_window) 
+        return;
+
+    if (state.*.process.memory_buffer) |*buf| {
+        imgui.MemoryEditor_DrawWindow(self.editor_window, "mem edit", buf.ptr, buf.len, 0);
+    } else {
+        imgui.MemoryEditor_DrawWindow(self.editor_window, "mem edit", &self.default_buf, self.default_buf.len, 0);
+    }
+        
 }
 
 

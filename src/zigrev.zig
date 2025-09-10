@@ -80,7 +80,8 @@ pub fn setup(config: Config) !Self {
     _ = c.cImGui_ImplOpenGL3_InitEx("#version 130");
     
     self.state = SharedState{
-        .process = Process.init(self.allocator),
+        .allocator = self.allocator,
+        .process = try Process.init(self.allocator),
     };
 
     self.ui = ui_dep.init();
