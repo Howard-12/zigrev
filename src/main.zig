@@ -8,5 +8,5 @@ pub fn main() !void {
     var rev = try zigrev.setup(config);
     defer rev.clean();
 
-    rev.run();
+    try rev.run();
 }

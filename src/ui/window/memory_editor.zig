@@ -24,7 +24,7 @@ pub fn init() Self {
     return self;
 }
 
-pub fn update(self: *Self, state: *SharedState) void{
+pub fn update(self: *Self, state: *SharedState) !void{
     if (!self.show_window) 
         return;
 

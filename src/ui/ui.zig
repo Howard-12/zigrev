@@ -14,9 +14,9 @@ const Window = union(enum) {
     main_viewport: main_viewport,
     memory_editor: memory_editor,
 
-    pub fn update(self: *Window, state: *SharedState) void {
+    pub fn update(self: *Window, state: *SharedState) !void {
         switch (self.*) {
-            inline else => |*win| win.update(state),
+            inline else => |*win| try win.update(state),
         }
     }
 
@@ -46,11 +46,10 @@ pub fn init() Self {
     return self;
 }
 
-// The purpose of this function is to sepatate the logic from the ui view keep the ui code clean (hopefully)
-// Also store temp data if needed
-pub fn update(self: *Self, state: *SharedState) void {
+// Update everything before drawing ui
+pub fn update(self: *Self, state: *SharedState) !void {
     for (&self.windows) |*win| {
-        win.update(state);
+        try win.update(state);
     }
 }
 
