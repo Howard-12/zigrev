@@ -56,7 +56,7 @@ pub fn draw(self: *Self, state: *SharedState) !void {
     if (imgui.ImGui_Button("Attach")) {
         if (self.selected_pid[0] > 0) { // User input is a char
             std.debug.print("selected pid: {s}\n", .{self.selected_pid});
-            state.process.set_current_active_process(try std.fmt.parseInt(i32, self.selected_pid[0..std.mem.len(@as([*:0]u8 ,@ptrCast(&self.selected_pid)))], 10)); // TODO: handle strings error
+            state.process.set_current_active_process(try std.fmt.parseInt(i32, self.selected_pid[0..std.mem.len(@as([*:0]u8 ,@ptrCast(&self.selected_pid)))], 10));
             if (state.process.attach_to_pid()) {
                 self.valid_pid = true;
             } 
@@ -68,7 +68,7 @@ pub fn draw(self: *Self, state: *SharedState) !void {
             self.valid_pid = false;
     }
 
-    // TODO: Show error message if the input is:
+    // Show error message if the input is:
     // - Empty
     // - Not a process
     if (!self.valid_pid) {
