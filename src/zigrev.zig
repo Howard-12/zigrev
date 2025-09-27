@@ -97,7 +97,7 @@ pub fn run(self: *Self) !void {
 
         // ui
         try self.ui.update(&self.state);
-        self.ui.draw(&self.state);
+        try self.ui.draw(&self.state);
 
         c.ImGui_Render();
 
@@ -119,7 +119,7 @@ pub fn run(self: *Self) !void {
 
 pub fn clean(self: *Self) void {
     // imgui
-    self.ui.deinit();
+    self.ui.deinit(&self.state);
     c.cImGui_ImplOpenGL3_Shutdown();
     c.cImGui_ImplGlfw_Shutdown();
     c.ImGui_DestroyContext(null);

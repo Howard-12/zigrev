@@ -20,15 +20,15 @@ const Window = union(enum) {
         }
     }
 
-    pub fn draw(self: *Window, state: *SharedState) void {
+    pub fn draw(self: *Window, state: *SharedState) !void {
         switch (self.*) {
-            inline else => |*win| win.draw(state),
+            inline else => |*win| try win.draw(state),
         }
     }
 
-    pub fn deinit(self: *Window) void {
+    pub fn deinit(self: *Window, state: *SharedState) void {
         switch (self.*) {
-            inline else => |*win| win.deinit(),
+            inline else => |*win| win.deinit(state),
         }
     }
 };
@@ -53,14 +53,14 @@ pub fn update(self: *Self, state: *SharedState) !void {
     }
 }
 
-pub fn draw(self: *Self, state: *SharedState) void {
+pub fn draw(self: *Self, state: *SharedState) !void {
     for (&self.windows) |*win| {
-        win.draw(state);
+        try win.draw(state);
     }
 }
 
-pub fn deinit(self: *Self) void {
+pub fn deinit(self: *Self, state: *SharedState) void {
     for (&self.windows) |*win| {
-        win.deinit();
+        win.deinit(state);
     }
 }

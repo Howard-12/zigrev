@@ -1,11 +1,16 @@
 const std = @import("std");
 const fs = std.fs;
-
+const pid_t = std.os.linux.pid_t;
 const Self = @This();
+const linux = std.os.linux;
 
 const proc_path = "/proc";
 
-process_id: u32,
+pub const ProcessError = error {
+    FailedToAttachToProcess,
+};
+
+process_id: pid_t,
 memory_buffer: ?[]u8,
 
 pub fn init() Self {
@@ -13,6 +18,8 @@ pub fn init() Self {
         .memory_buffer = null,
         .process_id = 0,
     };
+
+    std.debug.print("[*] Local pid: {d}\n", .{ get_local_process_pid() });
 
     return self;
 }
@@ -46,12 +53,34 @@ pub fn deinit(self: *Self) void {
 }
 
 
-pub fn set_current_active_process(self: *Self, pid: u32) void {
+pub fn set_current_active_process(self: *Self, pid: pid_t) void {
     self.process_id = pid;
 }
 
 pub fn attach_to_gdb() !void {
     
+}
+
+/// use ptrace syscall to attach the process
+/// TODO: i think i need to spawn a new thread
+pub fn attach_to_pid(self: *Self) !void {
+    const ret = linux.ptrace(linux.PTRACE.ATTACH, self.process_id, 0, 0, 0);
+    if (ret != 0)
+        return ProcessError.FailedToAttachToProcess;
+
+    std.debug.print("[*] Attached: {d}\n", .{ret});
+
+    var status: u32 = 0;
+    const wpid = linux.waitpid(self.process_id, &status, 0);
+    std.debug.print("wpid: {b}\n", .{wpid & 0xff});
+
+    // if spawn thread, need to store thread id?
+    // can i do seek mem in different function?
+}
+
+
+pub fn get_local_process_pid() std.os.linux.pid_t {
+    return linux.getpid();
 }
 
 fn is_pid(dir: []const u8) bool {

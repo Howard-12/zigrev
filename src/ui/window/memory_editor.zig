@@ -31,7 +31,7 @@ pub fn update(self: *Self, state: *SharedState) !void{
     _ = state;
 }
 
-pub fn draw(self: *Self, state: *SharedState) void {
+pub fn draw(self: *Self, state: *SharedState) !void {
     if (!self.show_window) 
         return;
 
@@ -44,6 +44,6 @@ pub fn draw(self: *Self, state: *SharedState) void {
 }
 
 
-pub fn deinit(_: *Self) void {
+pub fn deinit(_: *Self, _: *SharedState) void {
 
 }
