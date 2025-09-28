@@ -19,14 +19,14 @@ pub fn init() Self {
         .process_id = 0,
     };
 
-    std.debug.print("[*] Local pid: {d}\n", .{ get_local_process_pid() });
+    std.debug.print("[*] Local pid: {d}\n", .{ getLocalProcessPid() });
 
     return self;
 }
 
 
 // Might consider store the result as struct member in the future.
-pub fn enumerate_processes(self: *Self, allocator: std.mem.Allocator) ![]const [*:0]const u8 {
+pub fn enumerateProcesses(self: *Self, allocator: std.mem.Allocator) ![]const [*:0]const u8 {
     _ = self;
     var dirs: fs.Dir = try fs.openDirAbsoluteZ(proc_path, .{ .iterate = true });
     defer dirs.close();
@@ -35,7 +35,7 @@ pub fn enumerate_processes(self: *Self, allocator: std.mem.Allocator) ![]const [
 
     var pids = try std.ArrayList([*:0]const u8).initCapacity(allocator, 100);
     while (try dir_iter.next()) |dir| {
-        if (is_pid(dir.name)) {
+        if (isPid(dir.name)) {
             const ownd = try allocator.dupeZ(u8, dir.name);
             try pids.append(allocator, ownd);
         }
@@ -44,7 +44,7 @@ pub fn enumerate_processes(self: *Self, allocator: std.mem.Allocator) ![]const [
     return try pids.toOwnedSlice(allocator);
 }
 
-pub fn get_pid(target: []u8) u32 {
+pub fn getPid(target: []u8) u32 {
     _ = target;
 }
 
@@ -53,17 +53,17 @@ pub fn deinit(self: *Self) void {
 }
 
 
-pub fn set_current_active_process(self: *Self, pid: pid_t) void {
+pub fn setCurrentActiveProcess(self: *Self, pid: pid_t) void {
     self.process_id = pid;
 }
 
-pub fn attach_to_gdb() !void {
+pub fn attachToGdb() !void {
     
 }
 
 /// use ptrace syscall to attach the process
 /// TODO: i think i need to spawn a new thread
-pub fn attach_to_pid(self: *Self) !void {
+pub fn attachToPid(self: *Self) !void {
     const ret = linux.ptrace(linux.PTRACE.ATTACH, self.process_id, 0, 0, 0);
     if (ret != 0)
         return ProcessError.FailedToAttachToProcess;
@@ -79,11 +79,11 @@ pub fn attach_to_pid(self: *Self) !void {
 }
 
 
-pub fn get_local_process_pid() std.os.linux.pid_t {
+pub fn getLocalProcessPid() std.os.linux.pid_t {
     return linux.getpid();
 }
 
-fn is_pid(dir: []const u8) bool {
+fn isPid(dir: []const u8) bool {
     for (dir) |d| {
         if (!std.ascii.isDigit(d)) return false;
     }

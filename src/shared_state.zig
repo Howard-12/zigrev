@@ -1,5 +1,5 @@
 const std = @import("std");
-const Process = @import("debugger/process.zig");
+pub const Process = @import("debugger/process.zig");
 
 const Self = @This();
 
@@ -19,7 +19,7 @@ pub fn init(allocator: std.mem.Allocator) !Self {
     return self;
 }
 
-pub fn set_memorybuf(self: *Self, data: []const u8) !void {
+pub fn setProcessMemorybuf(self: *Self, data: []const u8) !void {
     self.process.memory_buffer = try self.allocator.alloc(u8, data.len);
     if (self.process.memory_buffer) |buf| {
         @memcpy(buf, data);
@@ -29,4 +29,13 @@ pub fn set_memorybuf(self: *Self, data: []const u8) !void {
 pub fn clean(self: *Self) void {
 
     self.process.deinit();
+}
+
+
+pub fn readMem(self: *Self) !void {
+    _ = self;
+    // TODO: read mem
+    // std.os.linux.process_vm_readv(pid: i32, local: []const iovec, remote: []const iovec_const, flags: usize)
+    // and set process.memory_buffer
+
 }

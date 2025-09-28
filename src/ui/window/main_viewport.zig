@@ -33,7 +33,7 @@ pub fn init() Self {
 
 pub fn update(self: *Self, state: *SharedState) !void{
     if (self.request_update) {
-        self.pid_buf = try state.process.enumerate_processes(state.allocator);
+        self.pid_buf = try state.process.enumerateProcesses(state.allocator);
 
         self.request_update = false;
     }
@@ -51,13 +51,13 @@ pub fn draw(self: *Self, state: *SharedState) !void {
 
     // Attach a running process
     imgui.ImGui_SeparatorText("Attach pid");
-    if (imgui.ImGui_InputTextEx("##", &self.selected_pid, self.selected_pid.len, imgui.ImGuiInputTextFlags_CallbackCharFilter, Self.alphabet_filter, null)) {}
+    if (imgui.ImGui_InputTextEx("##", &self.selected_pid, self.selected_pid.len, imgui.ImGuiInputTextFlags_CallbackCharFilter, Self.alphabetFilter, null)) {}
     imgui.ImGui_SameLine();
     if (imgui.ImGui_Button("Attach")) {
         if (self.selected_pid[0] > 0) { // User input is a char
             std.debug.print("selected pid: {s}\n", .{self.selected_pid});
-            state.process.set_current_active_process(try std.fmt.parseInt(i32, self.selected_pid[0..std.mem.len(@as([*:0]u8 ,@ptrCast(&self.selected_pid)))], 10));
-            if (state.process.attach_to_pid()) {
+            state.process.setCurrentActiveProcess(try std.fmt.parseInt(i32, self.selected_pid[0..std.mem.len(@as([*:0]u8 ,@ptrCast(&self.selected_pid)))], 10));
+            if (state.process.attachToPid()) {
                 self.valid_pid = true;
             } 
             else |err| switch (err) {
@@ -98,7 +98,7 @@ pub fn deinit(self: *Self, state: *SharedState) void {
         state.allocator.free(buf);
 }
 
-pub fn alphabet_filter(data: [*c]imgui.ImGuiInputTextCallbackData) callconv(.c) c_int {
+pub fn alphabetFilter(data: [*c]imgui.ImGuiInputTextCallbackData) callconv(.c) c_int {
     const current_char = data.*.EventChar;
     if (current_char >= '0' and current_char <= '9')
         return 0;
