@@ -8,6 +8,7 @@ const proc_path = "/proc";
 
 pub const ProcessError = error {
     FailedToAttachToProcess,
+    ProcessIdCanNotBeZero
 };
 
 process_id: pid_t,
@@ -25,7 +26,8 @@ pub fn init() Self {
 }
 
 
-// Might consider store the result as struct member in the future.
+/// Might consider store the result as struct member in the future.
+/// Enumerate all processes in the system. The caller owns the memory.
 pub fn enumerateProcesses(self: *Self, allocator: std.mem.Allocator) ![]const [*:0]const u8 {
     _ = self;
     var dirs: fs.Dir = try fs.openDirAbsoluteZ(proc_path, .{ .iterate = true });
@@ -44,6 +46,7 @@ pub fn enumerateProcesses(self: *Self, allocator: std.mem.Allocator) ![]const [*
     return try pids.toOwnedSlice(allocator);
 }
 
+/// Return pid of the local process
 pub fn getPid(target: []u8) u32 {
     _ = target;
 }
@@ -53,6 +56,7 @@ pub fn deinit(self: *Self) void {
 }
 
 
+/// Save the remote process pid
 pub fn setCurrentActiveProcess(self: *Self, pid: pid_t) void {
     self.process_id = pid;
 }
@@ -61,10 +65,14 @@ pub fn attachToGdb() !void {
     
 }
 
-/// use ptrace syscall to attach the process
-/// TODO: i think i need to spawn a new thread
+/// Use ptrace syscall to attach the process
+/// TODO: i think i need to spawn a new thread to handle all ptrace in a switch statement
 pub fn attachToPid(self: *Self) !void {
-    const ret = linux.ptrace(linux.PTRACE.ATTACH, self.process_id, 0, 0, 0);
+    if (self.process_id == 0)
+        return ProcessError.ProcessIdCanNotBeZero;
+
+    var ret: usize = undefined;
+    ret = linux.ptrace(linux.PTRACE.ATTACH, self.process_id, 0, 0, 0);
     if (ret != 0)
         return ProcessError.FailedToAttachToProcess;
 
@@ -74,8 +82,10 @@ pub fn attachToPid(self: *Self) !void {
     const wpid = linux.waitpid(self.process_id, &status, 0);
     std.debug.print("wpid: {b}\n", .{wpid & 0xff});
 
+    ret = linux.ptrace(linux.PTRACE.CONT, self.process_id, 0, 0, 0);
+
+
     // if spawn thread, need to store thread id?
-    // can i do seek mem in different function?
 }
 
 

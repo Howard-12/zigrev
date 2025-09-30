@@ -59,9 +59,9 @@ pub fn draw(self: *Self, state: *SharedState) !void {
             state.process.setCurrentActiveProcess(try std.fmt.parseInt(i32, self.selected_pid[0..std.mem.len(@as([*:0]u8 ,@ptrCast(&self.selected_pid)))], 10));
             if (state.process.attachToPid()) {
                 self.valid_pid = true;
-            } 
-            else |err| switch (err) {
+            } else |err| switch (err) {
                 SharedState.Process.ProcessError.FailedToAttachToProcess => self.valid_pid = false,
+                SharedState.Process.ProcessError.ProcessIdCanNotBeZero => self.valid_pid = false,
             }
                 
         } else 
@@ -86,7 +86,7 @@ pub fn draw(self: *Self, state: *SharedState) !void {
                             &self.pid_buf.?[0],
                             @intCast(self.pid_buf.?.len), 
                             10)) {
-        std.debug.print("selected index = {}\n", .{self.current_item});
+        // std.debug.print("selected index = {}\n", .{self.current_item});
         @memcpy(self.selected_pid[0..], self.pid_buf.?[@intCast(self.current_item)]);
     }
 

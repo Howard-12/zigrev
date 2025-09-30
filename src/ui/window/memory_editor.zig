@@ -35,6 +35,7 @@ pub fn draw(self: *Self, state: *SharedState) !void {
     if (!self.show_window) 
         return;
 
+    // TODO: read attached process memory region
     if (state.*.process.memory_buffer) |*buf| {
         imgui.MemoryEditor_DrawWindow(self.editor_window, "mem edit", buf.ptr, buf.len, 0);
     } else {
